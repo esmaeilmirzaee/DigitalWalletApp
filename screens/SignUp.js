@@ -1,4 +1,5 @@
-import React from 'react';
+/* eslint-disable react-native/no-inline-styles */
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -17,6 +18,38 @@ import {icons, images, COLORS, SIZES, FONTS} from '../constants';
 
 const SignUp = () => {
   const [showPassword, setShowPassword] = React.useState(false);
+
+  const [countries, setCountries] = React.useState([]);
+  const [selectedCountry, setSelectedCountry] = React.useState(null);
+  const [countryListVisibility, setCountryListVisibility] = React.useState(
+    false,
+  );
+
+  useEffect(() => {
+    const fetchCountries = async () => {
+      let res = await fetch('https://restcountries.eu/rest/v2/all');
+      let data = await res.json();
+      let fetchedData = data.map(c => {
+        return {
+          name: c.name,
+          code: c.alpha2Code,
+          callingCode: `+${c.callingCodes[0]}`,
+          flag: `https://www.countryflags.io/${c.alpha2Code}/shiny/64.png`,
+        };
+      });
+
+      setCountries(fetchedData);
+      if (fetchedData.length > 0) {
+        let defaultData = fetchedData.filter(c => c.code === 'CA');
+        if (defaultData) {
+          setSelectedCountry(defaultData[0]);
+        }
+      }
+    };
+    fetchCountries();
+  }, []);
+
+  console.log(countries.length, selectedCountry, countryListVisibility);
 
   function renderHeader() {
     return (
@@ -108,7 +141,7 @@ const SignUp = () => {
                 flexDirection: 'row',
                 ...FONTS.body2,
               }}
-              onPress={() => console.log('show modal')}>
+              onPress={() => setCountryListVisibility(true)}>
               <View style={{justifyContent: 'center'}}>
                 <Image
                   source={icons.down}
@@ -119,14 +152,16 @@ const SignUp = () => {
               {/* Flag */}
               <View style={{justofyContent: 'center', marginLeft: 5}}>
                 <Image
-                  source={images.usFlag}
+                  source={{uri: selectedCountry?.flag}}
                   resizeMode="contain"
                   style={{width: 30, height: 30}}
                 />
               </View>
 
               <View style={{justifyContent: 'center', marginLeft: 5}}>
-                <Text style={{color: COLORS.white, ...FONTS.body3}}>US+1</Text>
+                <Text style={{color: COLORS.white, ...FONTS.body3}}>
+                  {selectedCountry?.callingCode}
+                </Text>
               </View>
             </TouchableOpacity>
 
@@ -205,6 +240,56 @@ const SignUp = () => {
     );
   }
 
+  function renderCountryCodeModal() {
+    const renderItem = ({item}) => {
+      return (
+        <TouchableOpacity
+          style={{padding: SIZES.padding, flexDirection: 'row'}}
+          onPress={() => {
+            setSelectedCountry(item);
+            setCountryListVisibility(false);
+          }}>
+          <Image
+            source={{uri: item.flag}}
+            style={{width: 30, height: 30, marginRight: 10}}
+          />
+          <Text style={{...FONTS.body4}}>{item.name}</Text>
+        </TouchableOpacity>
+      );
+    };
+    return (
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={countryListVisibility}>
+        <TouchableWithoutFeedback
+          onPress={() => setCountryListVisibility(false)}>
+          <View
+            style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+            <View
+              style={{
+                height: 400,
+                width: SIZES.width * 0.6,
+                backgroundColor: COLORS.lightGreen,
+                borderRadius: SIZES.radius,
+              }}>
+              <FlatList
+                data={countries}
+                renderItem={renderItem}
+                keyExtractor={i => i.code}
+                showVerticalScrollIndicator={false}
+                style={{
+                  padding: SIZES.padding * 2,
+                  marginBottom: SIZES.padding * 2,
+                }}
+              />
+            </View>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
+    );
+  }
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : null}
@@ -217,6 +302,7 @@ const SignUp = () => {
           {renderButton()}
         </ScrollView>
       </LinearGradient>
+      {renderCountryCodeModal()}
     </KeyboardAvoidingView>
   );
 };
