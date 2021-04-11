@@ -294,7 +294,7 @@ const SignUp = () => {
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : null}
       style={{flex: 1}}>
-      <LinearGradient colors={[COLORS.lime, COLORS.emerald]} style={{flex: 1}}>
+      <LinearGradient colors={[COLORS.emerald, COLORS.lime]} style={{flex: 1}}>
         <ScrollView>
           {renderHeader()}
           {renderLogo()}
