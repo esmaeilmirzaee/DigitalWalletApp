@@ -1,5 +1,3 @@
-import Reacct from 'react';
-
 import Home from './Home';
 import SignUp from './SignUp';
 import Scan from './Scan';
