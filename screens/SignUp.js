@@ -16,14 +16,12 @@ import LinearGradient from 'react-native-linear-gradient';
 
 import {icons, images, COLORS, SIZES, FONTS} from '../constants';
 
-const SignUp = () => {
-  const [showPassword, setShowPassword] = React.useState(false);
+const SignUp = ({navigation}) => {
+  const [showPassword, setShowPassword] = useState(false);
 
-  const [countries, setCountries] = React.useState([]);
-  const [selectedCountry, setSelectedCountry] = React.useState(null);
-  const [countryListVisibility, setCountryListVisibility] = React.useState(
-    false,
-  );
+  const [countries, setCountries] = useState([]);
+  const [selectedCountry, setSelectedCountry] = useState(null);
+  const [countryListVisibility, setCountryListVisibility] = useState(false);
 
   useEffect(() => {
     const fetchCountries = async () => {
@@ -233,7 +231,7 @@ const SignUp = () => {
             alignItems: 'center',
             justifyContent: 'center',
           }}
-          onPress={() => console.log('Sign in')}>
+          onPress={() => navigation.navigate('Home')}>
           <Text style={{color: COLORS.white, ...FONTS.h3}}>Continue</Text>
         </TouchableOpacity>
       </View>
